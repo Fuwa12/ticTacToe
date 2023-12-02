@@ -1,102 +1,132 @@
-import math
-import time
-from player import HumanPlayer, RandomComputerPlayer, SmartComputerPlayer
+from tkinter import *
+import random
 
+global gameStatus  # this is global variable
+gameStatus = True
 
 class TicTacToe():
-    def __init__(self):
-        self.board = self.make_board()
-        self.current_winner = None
+    def next_turn(self, row, column):  # Add self parameter
 
-    @staticmethod
-    def make_board():
-        return [' ' for _ in range(9)]
+        global player
 
-    def print_board(self):
-        for row in [self.board[i*3:(i+1) * 3] for i in range(3)]:
-            print('| ' + ' | '.join(row) + ' |')
+        if buttons[row][column]['text'] == "" and self.check_winner() is False:
 
-    @staticmethod
-    def print_board_nums():
-        # 0 | 1 | 2
-        number_board = [[str(i) for i in range(j*3, (j+1)*3)] for j in range(3)]
-        for row in number_board:
-            print('| ' + ' | '.join(row) + ' |')
+            if player == players[0]:
 
-    def make_move(self, square, letter):
-        if self.board[square] == ' ':
-            self.board[square] = letter
-            if self.winner(square, letter):
-                self.current_winner = letter
-            return True
-        return False
+                buttons[row][column]['text'] = player
 
-    def winner(self, square, letter):
-        # check the row
-        row_ind = math.floor(square / 3)
-        row = self.board[row_ind*3:(row_ind+1)*3]
-        # print('row', row)
-        if all([s == letter for s in row]):
-            return True
-        col_ind = square % 3
-        column = [self.board[col_ind+i*3] for i in range(3)]
-        # print('col', column)
-        if all([s == letter for s in column]):
-            return True
-        if square % 2 == 0:
-            diagonal1 = [self.board[i] for i in [0, 4, 8]]
-            # print('diag1', diagonal1)
-            if all([s == letter for s in diagonal1]):
+                if self.check_winner() is False:
+                    player = players[1]
+                    label.config(text=(players[1]+" turn"))
+
+                elif self.check_winner() is True:
+                    label.config(text=(players[0]+" wins"))
+
+                elif self.check_winner() == "Tie":
+                    label.config(text="Tie!")
+
+            else:
+
+                buttons[row][column]['text'] = player
+
+                if self.check_winner() is False:
+                    player = players[0]
+                    label.config(text=(players[0]+" turn"))
+
+                elif self.check_winner() is True:
+                    label.config(text=(players[1]+" wins"))
+
+                elif self.check_winner() == "Tie":
+                    label.config(text="Tie!")
+
+    def check_winner(self):
+
+        for row in range(3):
+            if buttons[row][0]['text'] == buttons[row][1]['text'] == buttons[row][2]['text'] != "":
+                buttons[row][0].config(bg="green")
+                buttons[row][1].config(bg="green")
+                buttons[row][2].config(bg="green")
                 return True
-            diagonal2 = [self.board[i] for i in [2, 4, 6]]
-            # print('diag2', diagonal2)
-            if all([s == letter for s in diagonal2]):
+
+        for column in range(3):
+            if buttons[0][column]['text'] == buttons[1][column]['text'] == buttons[2][column]['text'] != "":
+                buttons[0][column].config(bg="green")
+                buttons[1][column].config(bg="green")
+                buttons[2][column].config(bg="green")
                 return True
-        return False
 
-    def empty_squares(self):
-        return ' ' in self.board
+        if buttons[0][0]['text'] == buttons[1][1]['text'] == buttons[2][2]['text'] != "":
+            buttons[0][0].config(bg="green")
+            buttons[1][1].config(bg="green")
+            buttons[2][2].config(bg="green")
+            return True
 
-    def num_empty_squares(self):
-        return self.board.count(' ')
+        elif buttons[0][2]['text'] == buttons[1][1]['text'] == buttons[2][0]['text'] != "":
+            buttons[0][2].config(bg="green")
+            buttons[1][1].config(bg="green")
+            buttons[2][0].config(bg="green")
+            return True
 
-    def available_moves(self):
-        return [i for i, x in enumerate(self.board) if x == " "]
+        elif self.empty_spaces() is False:
 
+            for row in range(3):
+                for column in range(3):
+                    buttons[row][column].config(bg="yellow")
+            return "Tie"
 
-def play(game, x_player, o_player, print_game=True):
-
-    if print_game:
-        game.print_board_nums()
-
-    letter = 'X'
-    while game.empty_squares():
-        if letter == 'O':
-            square = o_player.get_move(game)
         else:
-            square = x_player.get_move(game)
-        if game.make_move(square, letter):
-
-            if print_game:
-                print(letter + ' makes a move to square {}'.format(square))
-                game.print_board()
-                print('')
-
-            if game.current_winner:
-                if print_game:
-                    print(letter + ' wins!')
-                return letter  # ends the loop and exits the game
-            letter = 'O' if letter == 'X' else 'X'  # switches player
-
-        time.sleep(.8)
-
-    if print_game:
-        print('It\'s a tie!')
+            return False
 
 
+    def empty_spaces(self):
 
-if __name__ == '__main__':
-    x_player = SmartComputerPlayer('X')
-    o_player = HumanPlayer('O')
-    t = TicTacToe()
-    play(t, x_player, o_player, print_game=True)
+        spaces = 9
+
+        for row in range(3):
+            for column in range(3):
+                if buttons[row][column]['text'] != "":
+                    spaces -= 1
+
+        if spaces == 0:
+            return False
+        else:
+            return True
+
+def new_game():
+
+    global player
+
+    player = random.choice(players)
+
+    label.config(text=player+" turn")
+
+    for row in range(3):
+        for column in range(3):
+            buttons[row][column].config(text="",bg="#F0F0F0")
+
+
+window = Tk()
+game = TicTacToe()
+window.title("Tic-Tac-Toe")
+players = ["x","o"]
+player = random.choice(players)
+buttons = [[0,0,0],
+           [0,0,0],
+           [0,0,0]]
+
+label = Label(text=player + " turn", font=('consolas',40))
+label.pack(side="top")
+
+reset_button = Button(text="restart", font=('consolas',20), command=new_game)
+reset_button.pack(side="top")
+
+frame = Frame(window)
+frame.pack()
+
+for row in range(3):
+    for column in range(3):
+        buttons[row][column] = Button(frame, text="",font=('consolas',40), width=5, height=2,
+                                      command= lambda row=row, column=column: game.next_turn(row,column))
+        buttons[row][column].grid(row=row,column=column)
+
+window.mainloop()
