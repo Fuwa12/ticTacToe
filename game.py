@@ -77,20 +77,13 @@ class TicTacToe():
         else:
             return False
 
-
     def empty_spaces(self):
-
-        spaces = 9
-
         for row in range(3):
             for column in range(3):
-                if buttons[row][column]['text'] != "":
-                    spaces -= 1
+                if buttons[row][column]['text'] == "":
+                    return True
+        return False
 
-        if spaces == 0:
-            return False
-        else:
-            return True
 
 def new_game():
 
@@ -110,9 +103,11 @@ game = TicTacToe()
 window.title("Tic-Tac-Toe")
 players = ["x","o"]
 player = random.choice(players)
-buttons = [[0,0,0],
-           [0,0,0],
-           [0,0,0]]
+buttons = [[None, None, None],
+           [None, None, None],
+           [None, None, None]]
+
+
 
 label = Label(text=player + " turn", font=('consolas',40))
 label.pack(side="top")
