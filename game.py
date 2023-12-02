@@ -1,9 +1,6 @@
 from tkinter import *
 import random
 
-global gameStatus  # this is global variable
-gameStatus = True
-
 class TicTacToe():
     def next_turn(self, row, column):  # Add self parameter
 
